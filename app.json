@@ -1,0 +1,15 @@
+{
+  "name": "chat-messenger-frontend",
+  "description": "React frontend for Chat Messenger",
+  "scripts": {
+    "postdeploy": "npm run build"
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+} 

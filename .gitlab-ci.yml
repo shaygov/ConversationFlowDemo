@@ -1,0 +1,10 @@
+stages:
+  - deploy
+
+deploy_to_apache:
+  stage: deploy
+  script:
+    - echo "Deploying to Apache..."
+    - rsync -avz --delete build/ /var/www/html/chat-messenger/
+  only:
+    - main

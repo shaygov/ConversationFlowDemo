@@ -1,0 +1,84 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: ../backend
+    command: sh -c "node ace migration:run && node ace serve --watch"
+    ports:
+      - "3333:3333"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3333
+      NODE_ENV: development
+      APP_KEY: your_super_secret_key_here
+      DB_CONNECTION: pg
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: your_secure_password_here
+      PG_DB_NAME: chat-messenger
+      IS_DOCKER: true
+    depends_on:
+      - postgres
+    volumes:
+      - ../backend:/app
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: .
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - IS_DOCKER=true
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: your_secure_password_here
+      POSTGRES_DB: chat-messenger
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  seed:
+    build:
+      context: ../backend
+    command: sh -c "node ace migration:run && node ace db:seed"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 3333
+      NODE_ENV: development
+      APP_KEY: your_super_secret_key_here
+      DB_CONNECTION: pg
+      PG_HOST: postgres
+      PG_PORT: 5432
+      PG_USER: postgres
+      PG_PASSWORD: your_secure_password_here
+      PG_DB_NAME: chat-messenger
+      IS_DOCKER: true
+    depends_on:
+      - postgres
+    volumes:
+      - ../backend:/app
+    networks:
+      - app-network
+
+volumes:
+  pgdata:
+
+networks:
+  app-network:
